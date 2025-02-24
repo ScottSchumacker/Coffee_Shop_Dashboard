@@ -1,6 +1,7 @@
 # Scott Schumacker
 # Coffee Shop Dashboard
 
+# Loading libraries
 library(shiny)
 library(bslib)
 library(bsicons)
@@ -35,6 +36,9 @@ ui <- page_sidebar(
   card(
     plotlyOutput("totalRevPlot")
   ),
+  card(
+    plotlyOutput("totalNumberSales")
+  )
 )
 
 # Define server logic required to draw a histogram
@@ -53,7 +57,26 @@ server <- function(input, output) {
         geom_line() +
         theme_minimal() +
         xlab("Date") +
-        ylab("Total Sales Revenue ($)")
+        ylab("Total Sales Revenue ($)") +
+        ggtitle("Total Sales Revenue")
+    )
+  })
+  
+  # Creating total number of sales data frame
+  number_sales <- coffee_sales %>% 
+    group_by(Date) %>% 
+    summarise(count = n())
+  
+  # Creating total number of sales plot
+  output$totalNumberSales <- renderPlotly({
+    ggplotly(
+      ggplot(number_sales, aes(Date, count)) +
+        geom_point() +
+        geom_line() +
+        theme_minimal() +
+        xlab("Date") +
+        ylab("Number of Sales") +
+        ggtitle("Number of Sales")
     )
   })
 
