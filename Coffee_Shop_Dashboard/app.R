@@ -32,11 +32,30 @@ ui <- page_sidebar(
       value = textOutput("change")
     )
   ),
-  card(),
+  card(
+    plotlyOutput("totalRevPlot")
+  ),
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+  
+  # Creating total revenue data frame
+  total_revenueDF <- coffee_sales %>% 
+    group_by(Date) %>% 
+    summarise(total_rev = sum(Price))
+  
+  # Creating total revenue plot
+  output$totalRevPlot <- renderPlotly({
+    ggplotly(
+      ggplot(total_revenueDF, aes(Date, total_rev)) +
+        geom_point() +
+        geom_line() +
+        theme_minimal() +
+        xlab("Date") +
+        ylab("Total Sales Revenue ($)")
+    )
+  })
 
 }
 
